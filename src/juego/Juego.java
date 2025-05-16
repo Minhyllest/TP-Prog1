@@ -2,46 +2,59 @@ package juego;
 
 import entorno.Entorno;
 import entorno.InterfaceJuego;
-import java.awt.Color;
+import entorno.Herramientas;
+import java.awt.Image;
 
 public class Juego extends InterfaceJuego {
-    private Entorno entorno;
-    private double x = 600;  
-    private double y = 400;  
-    public double radio= 30;
-
+	public Image fondo; 
+    public Entorno entorno;
+    public Personaje personaje;
+    
     Juego() {
-        this.entorno = new Entorno(this, "Demo entorno", 1200, 800);
-        this.entorno.iniciar();
+        this.entorno = new Entorno(this, "Demo juego", 1400, 900);
+        this.fondo = Herramientas.cargarImagen("images/fondo.jpg").getScaledInstance(1400, 900, Image.SCALE_SMOOTH);
+        this.personaje = new Personaje(600, 400);
+        this.entorno.iniciar(); 
     }
 
     public void tick() {
-        
+        entorno.dibujarImagen(this.fondo, 700, 450, 0); 
+        this.personaje.dibujar(entorno);
+        if (this.personaje == null) {
+            return;
+        }
+
+        boolean seMovio = false;
+
         if (entorno.estaPresionada(entorno.TECLA_ARRIBA)) {
-            y -= 15;  
+            personaje.moverArriba();
+            seMovio = true;
         }
         if (entorno.estaPresionada(entorno.TECLA_ABAJO)) {
-            y += 15;  
+            personaje.moverAbajo();
+            seMovio = true;
         }
         if (entorno.estaPresionada(entorno.TECLA_IZQUIERDA)) {
-            x -= 15;  
+            personaje.moverIzquierda();
+            seMovio = true;
         }
         if (entorno.estaPresionada(entorno.TECLA_DERECHA)) {
-            x += 15; 
+            personaje.moverDerecha();
+            seMovio = true;
         }
-        
-       
-        if (x < radio) x = radio;
-        if (x > entorno.ancho()-radio) x = entorno.ancho()-radio;
-        if (y < radio) y = radio;
-        if (y > entorno.alto()-radio) y = entorno.alto()-radio;
 
-        entorno.colorFondo(Color.ORANGE);
-        entorno.dibujarCirculo(x, y, radio, Color.BLUE); 
         
+        if (!seMovio) {
+            personaje.quedarseQuieto();
+        }
+
+        personaje.dibujar(entorno);
     }
 
+
+    
+
     public static void main(String[] args) {
-        Juego juego = new Juego();
+        new Juego();
     }
 }
