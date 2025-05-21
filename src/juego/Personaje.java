@@ -1,104 +1,90 @@
 package juego;
 
 import entorno.Entorno;
-import entorno.Herramientas;
 import java.awt.Image;
 
 public class Personaje {
-	
-    public int x;
-    public int y;
-    public int velocidad;
-    
-    public Image enkiArriba;
-    public Image enkiAbajo;
-    public Image enkiIzquierda;
-    public Image enkiDerecha;
-    
+    public int x, y, velocidad;
     public Image imagenActual;
-    
-    public Image enkiQuietoArriba;
-    public Image enkiQuietoAbajo;
-    public Image enkiQuietoIzquierda;
-    public Image enkiQuietoDerecha;
-	
-    // carga de variables de instancia (posicion, velocoidad, animaciones e imagenes del personaje quieto).
 
-    public Personaje(int x, int y) {
-    	
+    public Image Arriba, Abajo, Izquierda, Derecha;
+    public Image QuietoArriba, QuietoAbajo, QuietoIzquierda, QuietoDerecha;
+	public int ancho;
+	public int alto;
+	
+
+    public Personaje(int x, int y, String tipo, int alto, int ancho) {
         this.x = x;
         this.y = y;
-        this.velocidad = 5;
+        this.velocidad = 2;
         
-        this.enkiArriba = Herramientas.cargarImagen("images/personaje/supgif.gif");
-        this.enkiAbajo = Herramientas.cargarImagen("images/personaje/gif2.gif");
-        this.enkiIzquierda = Herramientas.cargarImagen("images/personaje/izqgif.gif");
-        this.enkiDerecha = Herramientas.cargarImagen("images/personaje/dergif.gif");
+        if (tipo.equalsIgnoreCase("enki")) {
+        	
+        	Arriba = entorno.Herramientas.cargarImagen("images/enki/arriba.gif");
+            Abajo = entorno.Herramientas.cargarImagen("images/enki/abajo.gif");
+            Izquierda = entorno.Herramientas.cargarImagen("images/enki/izquierda.gif");
+            Derecha = entorno.Herramientas.cargarImagen("images/enki/derecha.gif");
+
+            QuietoArriba = entorno.Herramientas.cargarImagen("images/enki/quieto_arriba.gif");
+            QuietoAbajo = entorno.Herramientas.cargarImagen("images/enki/quieto_abajo.gif");
+            QuietoIzquierda = entorno.Herramientas.cargarImagen("images/enki/quieto_izquierda.gif");
+            QuietoDerecha = entorno.Herramientas.cargarImagen("images/enki/quieto_derecha.gif");
+        } else if (tipo.equalsIgnoreCase("ossaa")) {
         
-        this.enkiQuietoArriba = Herramientas.cargarImagen("images/personaje/supgifquieto.gif");
-        this.enkiQuietoAbajo = Herramientas.cargarImagen("images/personaje/gif2quieto.gif");
-        this.enkiQuietoDerecha = Herramientas.cargarImagen("images/personaje/dergifquieto.gif");
-        this.enkiQuietoIzquierda = Herramientas.cargarImagen("images/personaje/izqgifquieto.gif");
-        this.imagenActual = enkiQuietoAbajo; 
+            Arriba = entorno.Herramientas.cargarImagen("images/ossa/ossa-arriba.gif");
+            Abajo = entorno.Herramientas.cargarImagen("images/ossa/ossa-abajo.gif");
+            Izquierda = entorno.Herramientas.cargarImagen("images/ossa/ossa-izq.gif");
+            Derecha = entorno.Herramientas.cargarImagen("images/ossa/ossa-der.gif");
+
+            QuietoArriba = entorno.Herramientas.cargarImagen("images/ossa/ossa-arriba-quieto.gif");
+            QuietoAbajo = entorno.Herramientas.cargarImagen("images/ossa/ossa-abajo-quieto.gif");
+            QuietoIzquierda = entorno.Herramientas.cargarImagen("images/ossa/ossa-izq-quieto.gif");
+            QuietoDerecha = entorno.Herramientas.cargarImagen("images/ossa/ossa-der-quieto.gif");
+        }
+
+        this.imagenActual = QuietoAbajo;
     }
     
-    public void quedarseQuieto() { // funcion quedarse quieto que setea la imagen actual en base a la ultima posicion que haya tenido el personaje y pone la imagen quieta.
-        if (imagenActual == enkiIzquierda) imagenActual = enkiQuietoIzquierda;
-        else if (imagenActual == enkiDerecha) imagenActual = enkiQuietoDerecha;
-        else if (imagenActual == enkiArriba) imagenActual = enkiQuietoArriba;
-        else if (imagenActual == enkiAbajo) imagenActual = enkiQuietoAbajo;
-    }
-    
-    
-    
-    // Métodos para mover al personaje
+
     public void moverIzquierda() {
-        if (this.x - velocidad > 0 +20)
-            this.x -= velocidad;
-        this.imagenActual = this.enkiIzquierda;
+        x -= velocidad;
+        imagenActual = Izquierda;
     }
 
     public void moverDerecha() {
-        if (this.x + velocidad < 1400 -216) // Ancho de la pantalla
-            this.x += velocidad;
-        this.imagenActual = this.enkiDerecha;
+        x += velocidad;
+        imagenActual = Derecha;
     }
 
     public void moverArriba() {
-        if (this.y - velocidad > 0 +40)
-            this.y -= velocidad;
-        this.imagenActual = this.enkiArriba;
+        y -= velocidad;
+        imagenActual = Arriba;
     }
 
     public void moverAbajo() {
-        if (this.y + velocidad < 900 -40 ) // Alto de la pantalla
-            this.y += velocidad;
-        this.imagenActual = this.enkiAbajo;
+        y += velocidad;
+        imagenActual = Abajo;
     }
 
+    public void quedarseQuieto() {
+        if (imagenActual == Izquierda) imagenActual = QuietoIzquierda;
+        else if (imagenActual == Derecha) imagenActual = QuietoDerecha;
+        else if (imagenActual == Arriba) imagenActual = QuietoArriba;
+        else if (imagenActual == Abajo) imagenActual = QuietoAbajo;
+    }
 
-    
-    
-    // Dibuja el personaje
     public void dibujar(Entorno entorno) {
         entorno.dibujarImagen(imagenActual, x, y, 0);
     }
+    public int getX() {
+        return this.x;
+    }
 
-	public int getX() {
-		return x;
-	}
+    public int getY() {
+        return this.y;
+    }
 
-	public void setX(int x) {
-		this.x = x;
-	}
-
-	public int getY() {
-		return y;
-	}
-
-	public void setY(int y) {
-		this.y = y;
-	}
 }
+
 
 
