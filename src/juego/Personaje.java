@@ -11,12 +11,19 @@ public class Personaje {
     public Image QuietoArriba, QuietoAbajo, QuietoIzquierda, QuietoDerecha;
 	public int ancho;
 	public int alto;
+	private int velocidadBase;
+
 	
 
     public Personaje(int x, int y, String tipo, int alto, int ancho) {
         this.x = x;
         this.y = y;
         this.velocidad = 2;
+        this.velocidadBase = 2;
+        this.velocidad = velocidadBase;
+        this.ancho = ancho;
+        this.alto = alto;
+
         
         if (tipo.equalsIgnoreCase("enki")) {
         	
@@ -45,7 +52,36 @@ public class Personaje {
         this.imagenActual = QuietoAbajo;
     }
     
+    
+    public int getVelocidad() {
+        return velocidad;
+    }
 
+    public void setVelocidad(int v) {
+        this.velocidad = v;
+    }
+
+    public int getVelocidadBase() {
+        return velocidadBase;
+    }
+
+    public int getAncho() {
+        return ancho;
+    }
+
+    public int getAlto() {
+        return alto;
+    }
+
+    public void setX(int nuevoX) {
+        this.x = nuevoX;
+    }
+
+    public void setY(int nuevoY) {
+        this.y = nuevoY;
+    }
+
+    
     public void moverIzquierda() {
         x -= velocidad;
         imagenActual = Izquierda;
