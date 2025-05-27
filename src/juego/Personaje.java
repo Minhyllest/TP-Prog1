@@ -11,7 +11,8 @@ public class Personaje {
     public Image QuietoArriba, QuietoAbajo, QuietoIzquierda, QuietoDerecha;
 	public int ancho;
 	public int alto;
-	private int velocidadBase;
+	public int velocidadBase;
+	public double radio;
 
 	
 
@@ -23,7 +24,7 @@ public class Personaje {
         this.velocidad = velocidadBase;
         this.ancho = ancho;
         this.alto = alto;
-
+        this.radio=10;
         
         if (tipo.equalsIgnoreCase("enki")) {
         	

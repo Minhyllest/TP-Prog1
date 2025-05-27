@@ -11,31 +11,27 @@ public class Juego extends InterfaceJuego {
 
 	Menu menu = new Menu();
 	int seleccion = 0; // 0 = Enki, 1 = O'saa
-	Charco[] charcos;
+	
 
-	Obstaculo [] obstaculos;
+	
 	public Image fondo; 
     public Entorno entorno;
     public Personaje personaje;
     public Murcielago[] Murci= new Murcielago [10];
     public Poderes[] disparo = new Poderes [100];
-    
-    
+    public int contador;
+    public Obstaculo[] obstaculos = new Obstaculo[3];
+
+
     
     Juego() {
         int alto = 1280, ancho = 720;
         this.entorno = new Entorno(this, "funger arcade", alto, ancho);
         this.fondo = Herramientas.cargarImagen("images/fondo.jpg").getScaledInstance(alto, ancho, Image.SCALE_SMOOTH);
         this.entorno.iniciar();
-        charcos = new Charco[] {
-        		new Charco(400, 100, 30, 30),
-        		
-        };
-        obstaculos = new Obstaculo[] {
-        	    new Obstaculo(300, 200, 30, 30),
-        	    new Obstaculo(800, 500, 120, 60),
-        	};
-
+       
+        
+     
     }	
     
     
@@ -49,20 +45,14 @@ public class Juego extends InterfaceJuego {
                 if (entorno.sePresiono(entorno.TECLA_ENTER))
                     estado = EstadoJuego.SELECCION_PERSONAJE;
                 break;
-                
-            case SELECCION_PERSONAJE:
-            	
-                
-                menu.dibujarSeleccionPersonaje(entorno, seleccion);
-                
 
-                
+            case SELECCION_PERSONAJE:
+                menu.dibujarSeleccionPersonaje(entorno, seleccion);
+
                 if (entorno.sePresiono(entorno.TECLA_IZQUIERDA) || entorno.sePresiono(entorno.TECLA_DERECHA)) {
                     seleccion = 1 - seleccion;
-                    menu.reiniciarFade(); // reinicia correctamente
+                    menu.reiniciarFade();
                 }
-                
-
 
                 if (entorno.sePresiono(entorno.TECLA_ENTER)) {
                     String tipo = (seleccion == 0) ? "enki" : "ossaa";
@@ -70,107 +60,66 @@ public class Juego extends InterfaceJuego {
                     int ancho = (seleccion == 0) ? 52 : 70;
                     personaje = new Personaje(600, 400, tipo, alto, ancho);
 
+                    // Inicializar obstáculos
+                    obstaculos[0] = new Obstaculo(400, 300);
+                    obstaculos[1] = new Obstaculo(600, 500);
+                    obstaculos[2] = new Obstaculo(800, 200);
+
+                    // Inicializar murciélagos
                     for (int i = 0; i < 10; i++) {
                         int lado = (int)(Math.random() * 4 + 1);
                         switch (lado) {
-                            case 1: Murci[i] = new Murcielago((int)(Math.random()*800), 0); break;
-                            case 2: Murci[i] = new Murcielago(0, (int)(Math.random()*600)); break;
-                            case 3: Murci[i] = new Murcielago(800, (int)(Math.random()*600)); break;
-                            case 4: Murci[i] = new Murcielago((int)(Math.random()*800), 600); break;
+                            case 1: Murci[i] = new Murcielago((int)(Math.random() * 800), 0); break;
+                            case 2: Murci[i] = new Murcielago(0, (int)(Math.random() * 600)); break;
+                            case 3: Murci[i] = new Murcielago(800, (int)(Math.random() * 600)); break;
+                            case 4: Murci[i] = new Murcielago((int)(Math.random() * 800), 600); break;
                         }
                     }
-                    
-
-                    for (int i = 0; i < 3; i++)
-                    	
-                        disparo[i] = new Poderes(personaje, false, 0);
 
                     estado = EstadoJuego.JUGANDO;
                 }
+
                 break;
-                
-                
 
             case JUGANDO:
+                // Dibujar fondo
                 entorno.dibujarImagen(this.fondo, 640, 360, 0);
 
-                int nuevaX = personaje.getX();
-                int nuevaY = personaje.getY();
-
-                boolean seMovio = false;
-
-                if (entorno.estaPresionada(entorno.TECLA_IZQUIERDA)) { nuevaX -= personaje.getVelocidad(); personaje.imagenActual = personaje.Izquierda; seMovio = true; }
-                if (entorno.estaPresionada(entorno.TECLA_DERECHA))   { nuevaX += personaje.getVelocidad(); personaje.imagenActual = personaje.Derecha;   seMovio = true; }
-                if (entorno.estaPresionada(entorno.TECLA_ARRIBA))    { nuevaY -= personaje.getVelocidad(); personaje.imagenActual = personaje.Arriba;    seMovio = true; }
-                if (entorno.estaPresionada(entorno.TECLA_ABAJO))     { nuevaY += personaje.getVelocidad(); personaje.imagenActual = personaje.Abajo;     seMovio = true; }
-
-                // Verifica colisión con obstáculos
-                boolean colisiona = false;
+                // Dibujar y aplicar efecto de los obstáculos
                 for (Obstaculo o : obstaculos) {
-                    if (o.colisionaCon(nuevaX, nuevaY, personaje.getAncho(), personaje.getAlto())) {
-                        colisiona = true;
-                        break;
+                    if (o != null) {
+                        o.dibujar(entorno);
+                        o.aplicarEfecto(personaje);
                     }
                 }
 
-                if (!colisiona) {
-                    personaje.setX(nuevaX);
-                    personaje.setY(nuevaY);
+                // Movimiento del personaje
+                boolean seMovio = false;
+                if (entorno.estaPresionada(entorno.TECLA_IZQUIERDA)) {
+                    personaje.moverIzquierda();
+                    seMovio = true;
                 }
-
-                // Verifica si pisa un charco para ralentizar
-                boolean enCharco = false;
-                for (Charco c : charcos) {
-                    if (c.colisionaCon(personaje.getX(), personaje.getY(), personaje.getAncho(), personaje.getAlto())) {
-                        personaje.setVelocidad(personaje.getVelocidadBase() / 2);
-                        enCharco = true;
-                        break;
-                    }
+                if (entorno.estaPresionada(entorno.TECLA_DERECHA)) {
+                    personaje.moverDerecha();
+                    seMovio = true;
                 }
-                if (!enCharco) {
-                    personaje.setVelocidad(personaje.getVelocidadBase());
+                if (entorno.estaPresionada(entorno.TECLA_ARRIBA)) {
+                    personaje.moverArriba();
+                    seMovio = true;
                 }
-
-                // Dibujo elementos
-                for (Obstaculo o : obstaculos) o.dibujar(entorno);
-                for (Charco c : charcos) c.dibujar(entorno);
-
-                for (Murcielago m : Murci) {
-                    m.dibujarse(entorno);
-                    m.seguirMago(personaje);
+                if (entorno.estaPresionada(entorno.TECLA_ABAJO)) {
+                    personaje.moverAbajo();
+                    seMovio = true;
                 }
-
-                if (entorno.sePresiono(entorno.TECLA_ESPACIO)) {
-                    for (Poderes p : disparo) {
-                        if (p != null && !p.activo) {
-                            p.activo = true;
-                            p.moverDerecha();
-                            break;
-                        }
-                    }
-                }
-
-                for (Poderes p : disparo)
-                    if (p != null && p.activo) {
-                        p.dibujarseDisparo(entorno);
-                        p.moverDerecha();
-                    }
-
                 if (!seMovio) personaje.quedarseQuieto();
+
                 personaje.dibujar(entorno);
                 break;
-
         }
     }
-        
-
-
-    
     @SuppressWarnings("unused")
-
+    // ✅ Fuera de tick()
     public static void main(String[] args) {
-    	
-    	
         Juego juego = new Juego();
     }
 }

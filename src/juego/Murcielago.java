@@ -7,22 +7,20 @@ import entorno.Entorno;
 public class Murcielago {
 	private double x;
 	private double y;
-	private double angulo;
-	
+	private double radio;
+	private boolean colision;
 	public Murcielago(double x, double y) {
 		this.x =  x;
 		this.y = y;
-		this.angulo = 0;
+		this.radio = 10;
+		this.colision=false;
 	}
 	public void dibujarse(Entorno entorno)
 	{
 		entorno.dibujarCirculo(this.x, this.y, 20,Color.RED);
 		
 	}
-	public void cambiarAngulo(double x2, double y2){
-		this.angulo = Math.atan2(y2 - this.y, x2 - this.x);
-	}
-
+	
 	public void seguirMago(Personaje personaje){
 			if(this.x < personaje.getX()) {
 				this.x=this.x+1;
@@ -54,11 +52,18 @@ public class Murcielago {
 	public void setY(double y) {
 		this.y = y;
 	}
-	public double getAngulo() {
-		return angulo;
+
+	public double getRadio() {
+		return radio;
 	}
-	public void setAngulo(double angulo) {
-		this.angulo = angulo;
+	public void setRadio(double radio) {
+		this.radio = radio;
+	}
+	public boolean isColision() {
+		return colision;
+	}
+	public void setColision(boolean colision) {
+		this.colision = colision;
 	}
 
 	
