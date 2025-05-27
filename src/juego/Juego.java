@@ -111,10 +111,15 @@ public class Juego extends InterfaceJuego {
                     personaje.moverAbajo();
                     seMovio = true;
                 }
+                for (Obstaculo o : obstaculos) {
+                    if (o != null && o.colisionaCon(personaje)) {
+                        personaje.retroceder();
+                    }
                 if (!seMovio) personaje.quedarseQuieto();
 
                 personaje.dibujar(entorno);
                 break;
+                }
         }
     }
     @SuppressWarnings("unused")

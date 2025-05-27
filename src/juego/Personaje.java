@@ -13,8 +13,13 @@ public class Personaje {
 	public int alto;
 	public int velocidadBase;
 	public double radio;
+	private int xAnterior, yAnterior;
 
-	
+	public void retroceder() {
+	    this.x = this.xAnterior;
+	    this.y = this.yAnterior;
+	}
+
 
     public Personaje(int x, int y, String tipo, int alto, int ancho) {
         this.x = x;
@@ -81,24 +86,32 @@ public class Personaje {
     public void setY(int nuevoY) {
         this.y = nuevoY;
     }
-
+    private void guardarPosicion() {
+        this.xAnterior = this.x;
+        this.yAnterior = this.y;
+    }
     
     public void moverIzquierda() {
+    	guardarPosicion();
         x -= velocidad;
         imagenActual = Izquierda;
+        
     }
 
     public void moverDerecha() {
+    	guardarPosicion();
         x += velocidad;
         imagenActual = Derecha;
     }
 
     public void moverArriba() {
+    	guardarPosicion();
         y -= velocidad;
         imagenActual = Arriba;
     }
 
     public void moverAbajo() {
+    	guardarPosicion();
         y += velocidad;
         imagenActual = Abajo;
     }

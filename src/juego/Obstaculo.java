@@ -6,8 +6,8 @@ import java.awt.Image;
 
 public class Obstaculo {
     private int x, y;
-    private int ancho = 141;
-    private int alto = 124;
+    private int ancho = 124;
+    private int alto = 68;
     private Image imagen;
 
     public Obstaculo(int x, int y) {
@@ -18,8 +18,19 @@ public class Obstaculo {
 
     public void dibujar(Entorno entorno) {
         entorno.dibujarImagen(imagen, x, y, 0);
+
+        // 🔲 Dibuja un rectángulo representando el área del obstáculo
+        entorno.dibujarRectangulo(x, y, ancho, alto, 0, java.awt.Color.RED);
     }
 
+    public boolean colisionaCon(Personaje personaje) {
+        return this.x < personaje.getX() + personaje.getAncho() &&
+               this.x + this.ancho > personaje.getX() &&
+               this.y < personaje.getY() + personaje.getAlto() &&
+               this.y + this.alto > personaje.getY();
+    }
+
+    
     public boolean estaCerca(Personaje p) {
         double distanciaX = Math.abs(p.getX() - this.x);
         double distanciaY = Math.abs(p.getY() - this.y);
