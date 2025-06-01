@@ -12,13 +12,14 @@ public class Personaje {
 	public int ancho;
 	public int alto;
 	public int velocidadBase;
-	public double radio;
+	private double radio;
 	private int xAnterior, yAnterior;
+	private boolean colision;
+	private boolean esAtacado;
+	private int mana;
+	private int manaMaxima = 100;
 
-	public void retroceder() {
-	    this.x = this.xAnterior;
-	    this.y = this.yAnterior;
-	}
+	
 
 
     public Personaje(int x, int y, String tipo, int alto, int ancho) {
@@ -29,8 +30,11 @@ public class Personaje {
         this.velocidad = velocidadBase;
         this.ancho = ancho;
         this.alto = alto;
-        this.radio=10;
-        
+        this.setRadio(10);
+        this.colision=false;
+        this.esAtacado=false;
+        this.mana = manaMaxima;
+
         if (tipo.equalsIgnoreCase("enki")) {
         	
         	Arriba = entorno.Herramientas.cargarImagen("images/enki/arriba.gif");
@@ -57,8 +61,68 @@ public class Personaje {
 
         this.imagenActual = QuietoAbajo;
     }
+    public int getMana() {
+        return mana;
+    }
+
+    public int getManaMaxima() {
+        return manaMaxima;
+    }
+
+    public void gastarMana(int cantidad) {
+        mana -= cantidad;
+        if (mana < 0) mana = 0;
+    }
+
+    public void regenerarMana(int cantidad) {
+        mana += cantidad;
+        if (mana > manaMaxima) mana = manaMaxima;
+    }
+    public boolean tieneManaSuficiente(int cantidad) {
+        return mana >= cantidad;
+    }
+
+    public void moverYDetectarColision(int dx, int dy, Obstaculo[] obstaculos) {
+        int xOriginal = x;
+        int yOriginal = y;
+
+        // Movimiento horizontal
+        x += dx;
+        for (Obstaculo o : obstaculos) {
+            if (o != null && o.colisionaCon(this)) {
+                x = xOriginal;
+                break;
+            }
+        }
+
+        // Movimiento vertical
+        y += dy;
+        for (Obstaculo o : obstaculos) {
+            if (o != null && o.colisionaCon(this)) {
+                y = yOriginal;
+                break;
+            }
+        }
+
+        // Actualizar imagen según dirección
+        if (dx < 0) imagenActual = Izquierda;
+        else if (dx > 0) imagenActual = Derecha;
+        else if (dy < 0) imagenActual = Arriba;
+        else if (dy > 0) imagenActual = Abajo;
+    }
+
     
-    
+
+    public void guardarPosicion() {
+        this.xAnterior = this.x;
+        this.yAnterior = this.y;
+    }
+
+    public void retroceder() {
+        this.x = this.xAnterior;
+        this.y = this.yAnterior;
+    }
+
     public int getVelocidad() {
         return velocidad;
     }
@@ -86,10 +150,7 @@ public class Personaje {
     public void setY(int nuevoY) {
         this.y = nuevoY;
     }
-    private void guardarPosicion() {
-        this.xAnterior = this.x;
-        this.yAnterior = this.y;
-    }
+   
     
     public void moverIzquierda() {
     	guardarPosicion();
@@ -124,7 +185,9 @@ public class Personaje {
     }
 
     public void dibujar(Entorno entorno) {
+    	
         entorno.dibujarImagen(imagenActual, x, y, 0);
+        
     }
     public int getX() {
         return this.x;
@@ -133,8 +196,41 @@ public class Personaje {
     public int getY() {
         return this.y;
     }
+    
+    public boolean isColision() {
+		return colision;
+	}
+
+
+	public void setColision(boolean colision) {
+		this.colision = colision;
+	}
+
+
+	public double getRadio() {
+		return radio;
+	}
+
+
+	public void setRadio(double radio) {
+		this.radio = radio;
+	}
+
+
+	public boolean isEsAtacado() {
+		return esAtacado;
+	}
+
+
+	public void setEsAtacado(boolean esAtacado) {
+		this.esAtacado = esAtacado;
+	}
 
 }
+
+
+    
+
 
 
 
