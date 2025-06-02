@@ -1,5 +1,6 @@
 package juego;
 
+
 import entorno.Entorno;
 import entorno.InterfaceJuego;
 import entorno.Herramientas;
@@ -8,60 +9,88 @@ import java.awt.Color;
 import java.awt.Image;
 
 public class Juego extends InterfaceJuego {
-	enum EstadoJuego { MENU, SELECCION_PERSONAJE, JUGANDO }
-	EstadoJuego estado = EstadoJuego.MENU;
+    enum EstadoJuego { MENU, SELECCION_PERSONAJE, JUGANDO }
+    EstadoJuego estado = EstadoJuego.MENU;
 
-	Menu menu = new Menu();
-	int seleccion = 0; // 0 = Enki, 1 = O'saa
-	
+    Menu menu = new Menu();
+    int seleccion = 0;
 
-	
-	public Image fondo; 
+    public Image fondo;
     public Entorno entorno;
-    public Personaje personaje;
-    public Murcielago[] murci= new Murcielago [10];
-    public Poderes[] disparo = new Poderes [100];
+   
+    public Murcielago[] murci = new Murcielago[10];
+    public Poderes[] disparo = new Poderes[100];
     public int contadorDisparo;
     public Obstaculo[] obstaculos = new Obstaculo[3];
-    public Bomba[] bombas = new Bomba[10]; 
+    
+
     public int indiceBomba = 0;
     public Pocion[] pociones = new Pocion[20];
-    private int contadorPociones = 0; 
+    private int contadorPociones = 0;
+    public Bomba[] bombasInfinitas = new Bomba[10];
+    public Bomba[] bombasConMana = new Bomba[10];
+    public int indiceBombaInf = 0;
+    public int indiceBombaMana = 0;
+    
+    
+
+    Bomba[] bombas;
+    Boton[] botones;
+    int bombaSeleccionada = 0;
+    Personaje personaje;
+
     Boton botonBombaMana;
     Boton botonBombaInfinita;
-    Bomba[] bombasMana = new Bomba[10];
-    Bomba[] bombasInfinitas = new Bomba[10];
     Barra barraVida;
     Barra barraMana;
-
+    Bomba bombaInfinita;
+    Bomba bombaConMana;
     int tipoBombaSeleccionada = 0; // 0 = infinita, 1 = con maná
-
+  
     Juego() {
-        int alto = 1280, ancho = 720;
-        this.entorno = new Entorno(this, "funger arcade", alto, ancho);
-        this.fondo = Herramientas.cargarImagen("images/fondo.jpg").getScaledInstance(alto, ancho, Image.SCALE_SMOOTH);
-        this.entorno.iniciar(); 
+        this.entorno = new Entorno(this, "funger arcade", 1280, 720);
+        this.fondo = Herramientas.cargarImagen("images/fondo.jpg").getScaledInstance(1280, 720, Image.SCALE_SMOOTH);
+        this.bombas = new Bomba[20]; //
+        bombas = new Bomba[20];
+        bombasInfinitas = new Bomba[10];
+        bombasConMana = new Bomba[10];
+
+        // Imágenes de explosiones
+        Image gifInfinita = Herramientas.cargarImagen("images/explosiones/explAzul.gif");
+        Image gifMana = Herramientas.cargarImagen("images/explosiones/expl_02_.gif");
+        
+        // Bombas de referencia
+        bombaInfinita = new Bomba(gifInfinita, 60, false, 0);
+        bombaConMana = new Bomba(gifMana, 100, true, 30);
+
+        // Botones
+        botonBombaInfinita = new Boton(1200, 100, 145, 40, "Bomba Infinita", Color.BLUE);
+        botonBombaMana = new Boton(1200, 150, 150, 40, "Bomba Con Mana", Color.RED);
+
+        // Inicializar array de bombas
         for (int i = 0; i < bombas.length; i++) {
-            if (i % 2 == 0) {
-                // Bomba infinita: radio 60, sin maná, animación azul
-                bombas[i] = new Bomba(60, 0, "images/explosiones/explAzul.gif", false);
-            } else {
-                // Bomba que consume maná: radio 100, cuesta 30 MP, animación roja
-                bombas[i] = new Bomba(100, 30, "images/explosiones/explRoja.gif", true);
-            }
+            bombas[i] = new Bomba(gifInfinita, 80, false, 0); // luego se sobreescriben al lanzar
         }
+        
+        
+        
 
-        botonBombaMana = new Boton(1200, 100, 100, 40, "Bomba MP");
-        botonBombaInfinita = new Boton(1200, 160, 100, 40, "Bomba ∞");
-        botonBombaInfinita.setSeleccionado(true); // por defecto
+        this.entorno.iniciar();
+    }
 
+    public void dibujarBarraMana(Entorno entorno) {
+        int x = 50;
+        int y = 30;
+        int ancho = 200;
+        int alto = 20;
+        int manaActual = personaje.getMana();
+        int manaMaximo = personaje.getManaMaximo();
+        double porcentaje = (double) manaActual / manaMaximo;
+        int anchoActual = (int) (ancho * porcentaje);
+        entorno.dibujarRectangulo(x + ancho / 2, y, ancho, alto, 0, Color.WHITE);
+        entorno.dibujarRectangulo(x + anchoActual / 2, y, anchoActual, alto - 4, 0, Color.CYAN);
+    }
 
-    }	
-    
-    
-    
-    
-    
     public void tick() {
         switch (estado) {
             case MENU:
@@ -72,66 +101,75 @@ public class Juego extends InterfaceJuego {
 
             case SELECCION_PERSONAJE:
                 menu.dibujarSeleccionPersonaje(entorno, seleccion);
-
                 if (entorno.sePresiono(entorno.TECLA_IZQUIERDA) || entorno.sePresiono(entorno.TECLA_DERECHA)) {
                     seleccion = 1 - seleccion;
                     menu.reiniciarFade();
                 }
-
                 if (entorno.sePresiono(entorno.TECLA_ENTER)) {
                     String tipo = (seleccion == 0) ? "enki" : "ossaa";
                     int alto = (seleccion == 0) ? 111 : 120;
                     int ancho = (seleccion == 0) ? 52 : 70;
                     personaje = new Personaje(600, 400, tipo, alto, ancho);
                     barraVida = new Barra(150, 40, 200, 20, Color.RED, Color.DARK_GRAY, personaje.getVidaMaxima());
-                    barraMana = new Barra(150, 70, 200, 20, Color.BLUE, Color.DARK_GRAY, personaje.getManaMaxima());
+                    barraMana = new Barra(150, 70, 200, 20, Color.BLUE, Color.DARK_GRAY, personaje.getManaMaximo());
 
-                    // Inicializar obstáculos
+                    for (int i = 0; i < murci.length; i++) {
+                        int lado = (int) (Math.random() * 4 + 1);
+                        int x = (lado == 1 || lado == 4) ? (int) (Math.random() * 1280) : (lado == 2 ? 0 : 1280);
+                        int y = (lado == 2 || lado == 3) ? (int) (Math.random() * 720) : (lado == 1 ? 0 : 720);
+                        murci[i] = new Murcielago(x, y);
+                    }
+
                     obstaculos[0] = new Obstaculo(400, 300);
                     obstaculos[1] = new Obstaculo(600, 500);
                     obstaculos[2] = new Obstaculo(800, 200);
-                    
-                    
-                    
-                    // Inicializar murciélagos
-                    for (int i = 0; i < murci.length; i++) {
-                        int lado = (int)(Math.random() * 4 + 1);
-                        switch (lado) {
-                            case 1: murci[i] = new Murcielago((int)(Math.random() * 1280), 0); break;
-                            case 2: murci[i] = new Murcielago(0, (int)(Math.random() * 720)); break;
-                            case 3: murci[i] = new Murcielago(1280, (int)(Math.random() * 720)); break;
-                            case 4: murci[i] = new Murcielago((int)(Math.random() * 1280), 720); break;
-                        }
-                    }
-                    // Inicializar disparos
 
                     estado = EstadoJuego.JUGANDO;
                 }
-
                 break;
 
             case JUGANDO:
-                // Dibujar fondo
                 entorno.dibujarImagen(this.fondo, 640, 360, 0);
+
+                if (personaje == null) break;
+
+                personaje.dibujar(entorno);
+                barraVida.setValor(personaje.getVida());
+                barraMana.setValor(personaje.getMana());
+                barraVida.dibujar(entorno);
+                barraMana.dibujar(entorno);
+
+                botonBombaMana.dibujar(entorno);
+                botonBombaInfinita.dibujar(entorno);
                 
                 
-                
-             // --- DIBUJAR BARRA DE VIDA ---
+                if (tipoBombaSeleccionada == 0) { // Bomba infinita
+                    
+                    indiceBombaInf++;
+                    if (indiceBombaInf >= bombasInfinitas.length) indiceBombaInf = 0;
+                } else if (tipoBombaSeleccionada == 1 && barraMana.valorMaximo >= 20) { // Bomba con maná
+                    
+                    barraMana.valorMaximo -= 20; // gasto de maná
+                    indiceBombaMana++;
+                    if (indiceBombaMana >= bombasConMana.length) indiceBombaMana = 0;
+                }
+
+                // --- DIBUJAR BARRA DE VIDA ---
                 int vidaActual = personaje.getVida();  // asumirás luego que se implementa
-                int vidaMax = personaje.getVidaMax();  // lo mismo
+                int vidaMax = personaje.getVidaMaxima();  // lo mismo
                 int largoVida = (int)((vidaActual / (double)vidaMax) * 200); // largo proporcional
                 entorno.dibujarRectangulo(100, 30, 200, 20, 0, Color.GRAY); // fondo
                 entorno.dibujarRectangulo(100 - (200 - largoVida) / 2, 30, largoVida, 20, 0, Color.RED); // barra
 
                 // --- DIBUJAR BARRA DE MANA ---
                 int manaActual = personaje.getMana();
-                int manaMax = personaje.getManaMax();
+                int manaMax = personaje.getManaMaximo();
                 int largoMana = (int)((manaActual / (double)manaMax) * 200);
                 entorno.dibujarRectangulo(100, 60, 200, 20, 0, Color.DARK_GRAY);
                 entorno.dibujarRectangulo(100 - (200 - largoMana) / 2, 60, largoMana, 20, 0, Color.BLUE);
 
                 // Opcional: etiquetas
-                entorno.cambiarFont(Herramientas.Fuente("Arial", 14, 1));
+                entorno.cambiarFont("Arial", 14, Color.white, 1);;
                 entorno.escribirTexto("Vida", 10, 35);
                 entorno.escribirTexto("Mana", 10, 65);
 
@@ -161,9 +199,17 @@ public class Juego extends InterfaceJuego {
         			murci[i].seguirMago(personaje);
         			if(murci[i].colision(personaje)==true ) {
         				
-        			//	System.out.println(murci[i].isAtacando());
+        				System.out.println(murci[i].isAtacando());
         					}
         				}
+        			for (int i1 = 0; i1 < murci.length; i1++) {
+        			    if (murci[i1] != null && personaje.colisionaCon(murci[i1])) {
+        			        personaje.recibirDanio(10); // o la cantidad de daño que quieras
+        			        // podés hacer que el murciélago desaparezca:
+        			        murci[i1] = null;
+        			    }
+        			}
+	
         			
                 }
                 
@@ -233,33 +279,60 @@ public class Juego extends InterfaceJuego {
                 
                 
                 
-///////////////if (entorno.sePresionoBoton(entorno.BOTON_IZQUIERDO)) {
-    int mouseX = entorno.mouseX();
-    int mouseY = entorno.mouseY();
+             // Obtener posición del mouse
+                int mouseX = entorno.mouseX();
+                int mouseY = entorno.mouseY();
 
-    for (int i = 0; i < bombas.length; i++) {
-        int idx = (indiceBomba + i) % bombas.length;
+                // Si se presionó clic izquierdo
+                if (entorno.sePresionoBoton(entorno.BOTON_IZQUIERDO)) {
+                    // Verifica que no se haya hecho clic en los botones
+                    if (!botonBombaMana.fueClickeado(mouseX, mouseY) && !botonBombaInfinita.fueClickeado(mouseX, mouseY)) {
+                        Bomba referencia = (tipoBombaSeleccionada == 0) ? bombaInfinita : bombaConMana;
 
-        if (!bombas[idx].estaActiva()) {
-            boolean activada = bombas[idx].activar(mouseX, mouseY, personaje); // <-- se pasa el personaje
-            if (activada) {
-                indiceBomba = (idx + 1) % bombas.length;
-            }
-            break;
-        }
-    }
-}
+                        if (referencia.getCostoMana() == 0 || personaje.getMana() >= referencia.getCostoMana()) {
+                            for (int i = 0; i < bombas.length; i++) {
+                                int idx = (indiceBomba + i) % bombas.length;
+                                if (!bombas[idx].estaActiva()) {
+                                    String ruta = tipoBombaSeleccionada == 0
+                                        ? "images/explosiones/explAzul.gif"
+                                        : "images/explosiones/explRoja.gif";
+                                    Image img = Herramientas.cargarImagen(ruta);
 
+                                    bombas[idx] = new Bomba(img, referencia.getRadioExplosion(), referencia.usaMana(), referencia.getCostoMana());
+                                    bombas[idx].activar(mouseX, mouseY, personaje);
 
+                                    indiceBomba = (idx + 1) % bombas.length;
 
+                                    if (referencia.getCostoMana() > 0) {
+                                        personaje.gastarMana(referencia.getCostoMana());
+                                    }
+                                    break;
+                                }
+                            }
+                        } else {
+                            // Si no hay maná suficiente, cambiar a bomba infinita
+                            tipoBombaSeleccionada = 0;
+                            botonBombaMana.setSeleccionado(false);
+                            botonBombaInfinita.setSeleccionado(true);
+                        }
+                    }
+                }
+                
+                for (Bomba b : bombas)
+                    if (b != null && b.estaActiva()) b.dibujar(entorno);
+
+                // Dibujar bombas activas
                 for (Bomba b : bombasInfinitas)
-                    if (b.estaActiva()) b.dibujar(entorno);
+                    if (b != null && b.estaActiva())
+                        b.dibujar(entorno);
 
-                for (Bomba b : bombasMana)
-                    if (b.estaActiva()) b.dibujar(entorno);
+                for (Bomba b : bombasConMana)
+                    if (b != null && b.estaActiva())
+                        b.dibujar(entorno);
 
+                // Aplicar daño a murciélagos por bombas
                 for (Bomba bomba : bombasInfinitas) {
-                    if (bomba.estaActiva()) {
+                    if (bomba != null && bomba.estaActiva()) {
                         for (int i = 0; i < murci.length; i++) {
                             if (murci[i] != null && bomba.enRangoExplosion(murci[i].getX(), murci[i].getY())) {
                                 Pocion nuevaPocion = murci[i].generarPocion();
@@ -270,25 +343,44 @@ public class Juego extends InterfaceJuego {
                         }
                     }
                 }
-               
 
-
-              
-              
-    
-////////////////////////////////////////////////////////////////////////////////////////////////////////
-                //Pociones 
+                for (Bomba bomba : bombasConMana) {
+                    if (bomba != null && bomba.estaActiva()) {
+                        for (int i = 0; i < murci.length; i++) {
+                            if (murci[i] != null && bomba.enRangoExplosion(murci[i].getX(), murci[i].getY())) {
+                                Pocion nuevaPocion = murci[i].generarPocion();
+                                if (nuevaPocion != null && contadorPociones < pociones.length)
+                                    pociones[contadorPociones++] = nuevaPocion;
+                                murci[i] = null;
+                            }
+                        }
+                    }
+                }
+                for (Bomba bomba : bombas) {
+                    if (bomba != null && bomba.estaActiva()) {
+                        for (int i = 0; i < murci.length; i++) {
+                            if (murci[i] != null && bomba.enRangoExplosion(murci[i].getX(), murci[i].getY())) {
+                                Pocion nuevaPocion = murci[i].generarPocion();
+                                if (nuevaPocion != null && contadorPociones < pociones.length)
+                                    pociones[contadorPociones++] = nuevaPocion;
+                                murci[i] = null;
+                            }
+                        }
+                    }
+                }
+                // Mostrar y recolectar pociones activas
                 for (int i = 0; i < contadorPociones; i++) {
                     if (pociones[i] != null && pociones[i].estaActiva()) {
                         pociones[i].dibujar(entorno);
-                        
+
                         if (pociones[i].colisionaCon(personaje)) {
-                            // Efecto al recolectar (ej: curar 20 puntos de vida)
-                     //       personaje.curar(20);
+                            personaje.recuperarMana(20); // o la cantidad que quieras
                             pociones[i].recolectar();
-                        }                    }
+                        }
+
+                    }
                 }
-                
+
                  // Movimiento del personaje
                 int dx = 0;
                 int dy = 0;
@@ -303,22 +395,55 @@ public class Juego extends InterfaceJuego {
                 } else {
                     personaje.quedarseQuieto();
                 }
-                barraVida.setValor(personaje.getVida());
-                barraMana.setValor(personaje.getMana());
+               
 
-                barraVida.dibujar(entorno);
-                barraMana.dibujar(entorno);
+                
 
                 personaje.dibujar(entorno);
+                barraVida.setValor(personaje.getVida());
+                barraMana.setValor(personaje.getMana());
+                barraVida.dibujar(entorno);
+                barraMana.dibujar(entorno);
+                barraVida.restar(personaje.getVida());
+                barraVida.dibujar(entorno);
+
+             // Dibujar barra de maná
+                dibujarBarraMana(entorno);
+              
                 break;
-                }
+        }
+    }
 
-}
 
-    
-    @SuppressWarnings("unused")
-    // ✅ Fuera de tick()
+
+
     public static void main(String[] args) {
-        Juego juego = new Juego();
+        try {
+            new Juego();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

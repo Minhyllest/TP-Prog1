@@ -15,7 +15,7 @@ public class Poderes {
         boolean activo;
         int direccion;
         boolean colision;
-        private final Image gifProy;
+        public Image gifProy;
 
         public Poderes(Personaje personaje, boolean especial, double radio) {
             this.x=personaje.getX();
@@ -26,7 +26,7 @@ public class Poderes {
             this.activo=false;
             this.direccion=0;
             this.colision=false;
-            this.gifProy = Herramientas.cargarImagen("images/explosiones/proyectilAzul1.gif");
+            this.gifProy = Herramientas.cargarImagen("images/explosiones/ProyectilAzul1.gif");
         }
 
         public void posicionActual(Personaje personaje) {

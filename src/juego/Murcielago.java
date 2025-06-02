@@ -1,6 +1,7 @@
 package juego;
 
 import java.awt.Color;
+import java.awt.Image;
 import java.util.Random;
 
 import entorno.Entorno;
@@ -13,6 +14,7 @@ public class Murcielago {
     private boolean atacando;
     private final Random random = new Random();
     private final double probabilidadPocion = 0.3; // 30% de probabilidad
+    private Image imagen = entorno.Herramientas.cargarImagen("images/bat4.gif");
 
     public Murcielago(double x, double y) {
         this.x = x;
@@ -32,7 +34,7 @@ public class Murcielago {
 
     // Resto de métodos sin cambios...
     public void dibujarse(Entorno entorno) {
-        entorno.dibujarCirculo(x, y, 20, Color.RED);
+        entorno.dibujarImagen(imagen, x, y, 0);
     }
 
     public void seguirMago(Personaje personaje) {

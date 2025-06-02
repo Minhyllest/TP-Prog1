@@ -1,84 +1,64 @@
 package juego;
 
 import java.awt.Image;
-
 import entorno.Entorno;
-import entorno.Herramientas;
 
 public class Bomba {
     private double x;
     private double y;
     private boolean activa = false;
     private int duracion = 0;
-    private final Image gifExplos;
-    private boolean consumeMana;
-    private int costoMana;
-    private Image gifExplosion;
-    private boolean usaMana;
-    private int radioExplosion;
-  
-    
-  
 
+    private final Image animacion;
+    private final int radioExplosion;
+    private final boolean usaMana;
+    private final int costoMana;
 
-
-    public Bomba(int radio, int costoMana, String rutaGif, boolean usaMana) {
-        this.radioExplosion = radio;
-        this.costoMana = costoMana;
-        this.gifExplosion = Herramientas.cargarImagen(rutaGif);
+    public Bomba(Image animacion, int radioExplosion, boolean usaMana, int costoMana) {
+        this.animacion = animacion;
+        this.radioExplosion = radioExplosion;
         this.usaMana = usaMana;
+        this.costoMana = costoMana;
     }
 
-
-
-    public boolean activar(double x, double y, Personaje personaje) {
-        if (usaMana && !personaje.tieneManaSuficiente(costoMana)) {
-            return false; // no se puede usar
-        }
-
-        if (usaMana) {
-            personaje.gastarMana(costoMana);
-        }
-
+    public void activar(double x, double y, Personaje personaje) {
         this.x = x;
         this.y = y;
+        this.duracion = 60; // duración en cuadros (~1 segundo)
         this.activa = true;
-        this.duracion = 50;
-        return true;
-    }
-
-    public boolean esDeMana() {
-        return usaMana;
-    }
-
-    public int getRadio() {
-        return radioExplosion;
-    }
-
-    public void desactivar() {
-        this.activa = false;
-        this.duracion = 0;
     }
 
     public boolean estaActiva() {
         return activa;
     }
 
+    public boolean enRangoExplosion(double objX, double objY) {
+        if (!activa) return false;
+        double dx = objX - x;
+        double dy = objY - y;
+        return Math.sqrt(dx * dx + dy * dy) < radioExplosion;
+    }
+
     public void dibujar(Entorno entorno) {
-        if (!activa) return;
-        entorno.dibujarImagen(gifExplos, x, y, 0);
-        duracion--;
-        if (duracion <= 0) desactivar();
+        if (activa) {
+            entorno.dibujarImagen(animacion, x, y, 0, 1.0);
+            duracion--;
+            if (duracion <= 0) {
+                activa = false;
+            }
+        }
     }
 
-    public boolean enRangoExplosion(double px, double py) {
-        double dx = px - x;
-        double dy = py - y;
-        double distancia = Math.sqrt(dx * dx + dy * dy);
-        return distancia <= radioExplosion;
+    public boolean usaMana() {
+        return usaMana;
     }
 
-    public boolean requiereMana() {
-        return consumeMana;
+    public int getCostoMana() {
+        return costoMana;
+    }
+
+    public int getRadioExplosion() {
+        return radioExplosion;
     }
 }
+

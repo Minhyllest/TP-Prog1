@@ -8,7 +8,7 @@ public class Barra {
     private Color colorFondo;
     private Color colorRelleno;
     private int valorActual;
-    private int valorMaximo;
+    int valorMaximo;
 
     public Barra(int x, int y, int ancho, int alto, Color colorRelleno, Color colorFondo, int valorMaximo) {
         this.x = x;
@@ -39,4 +39,9 @@ public class Barra {
             colorRelleno
         );
     }
+
+	public void restar(int costoMana) {
+		valorActual = -10;
+		
+	}
 }

@@ -17,7 +17,11 @@ public class Personaje {
 	private boolean colision;
 	private boolean esAtacado;
 	private int mana;
-	private int manaMaxima = 100;
+	private final int manaMaximo = 100;
+	private int vida;
+    private int vidaMaxima = 100;
+    
+
 
 	
 
@@ -33,7 +37,7 @@ public class Personaje {
         this.setRadio(10);
         this.colision=false;
         this.esAtacado=false;
-        this.mana = manaMaxima;
+        this.mana = manaMaximo; // Comienza con maná lleno
 
         if (tipo.equalsIgnoreCase("enki")) {
         	
@@ -61,26 +65,47 @@ public class Personaje {
 
         this.imagenActual = QuietoAbajo;
     }
-    public int getMana() {
-        return mana;
+
+    public int getVida() {
+        return vida;
     }
 
-    public int getManaMaxima() {
-        return manaMaxima;
+    public int getVidaMaxima() {
+        return vidaMaxima;
     }
 
-    public void gastarMana(int cantidad) {
-        mana -= cantidad;
-        if (mana < 0) mana = 0;
-    }
+   
 
-    public void regenerarMana(int cantidad) {
-        mana += cantidad;
-        if (mana > manaMaxima) mana = manaMaxima;
-    }
+    public boolean gastarMana(int cantidad) {
+    	if (this.mana >= cantidad) {
+    	this.mana -= cantidad;
+    	return true;
+    	}
+    	return false;
+    	}
+    public void recuperarMana(int cantidad) {
+    	this.mana += cantidad;
+    	if (this.mana > manaMaximo) {
+    	this.mana = manaMaximo;
+    	}
+    	}
     public boolean tieneManaSuficiente(int cantidad) {
         return mana >= cantidad;
     }
+    
+    public void recibirDanio(int cantidad) {
+        this.vida -= cantidad;
+        if (this.vida < 0) {
+            this.vida = 0;
+        }
+    }
+    public boolean colisionaCon(Murcielago m) {
+        double dx = this.x - m.getX();
+        double dy = this.y - m.getY();
+        double distancia = Math.sqrt(dx * dx + dy * dy);
+        return distancia < this.radio + m.getRadio();
+    }
+	
 
     public void moverYDetectarColision(int dx, int dy, Obstaculo[] obstaculos) {
         int xOriginal = x;
@@ -224,6 +249,16 @@ public class Personaje {
 
 	public void setEsAtacado(boolean esAtacado) {
 		this.esAtacado = esAtacado;
+	}
+
+	public int getMana() {
+		// TODO Auto-generated method stub
+		return mana;
+	}
+
+	public int getManaMaximo() {
+		// TODO Auto-generated method stub
+		return manaMaximo;
 	}
 
 }
