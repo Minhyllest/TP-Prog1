@@ -29,9 +29,12 @@ public class Boton {
         entorno.escribirTexto(texto, x - textoAnchoEstimado / 2, y + 5);
     }
 
-    public boolean fueClickeado(int mouseX, int mouseY) {
-        return mouseX >= x - ancho / 2 && mouseX <= x + ancho / 2 &&
-               mouseY >= y - alto / 2 && mouseY <= y + alto / 2;
+    public boolean fueClickeado(Entorno entorno) {
+        if (entorno.mouseX() >= x - ancho / 2 && entorno.mouseX() <= x + ancho / 2 &&
+               entorno.mouseY() >= y - alto / 2 && entorno.mouseY() <= y + alto / 2) {
+        return	true;       	
+        }
+        return false;
     }
 
     public void setSeleccionado(boolean seleccionado) {
@@ -39,6 +42,6 @@ public class Boton {
     }
 
     public boolean estaSeleccionado() {
-        return seleccionado;
+        return this.seleccionado;
     }
 }

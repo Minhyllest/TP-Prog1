@@ -17,15 +17,9 @@ public class Personaje {
 	private boolean colision;
 	private boolean esAtacado;
 	private int mana;
-	private final int manaMaximo = 100;
 	private int vida;
-    private int vidaMaxima = 100;
-    
-
 
 	
-
-
     public Personaje(int x, int y, String tipo, int alto, int ancho) {
         this.x = x;
         this.y = y;
@@ -37,7 +31,8 @@ public class Personaje {
         this.setRadio(10);
         this.colision=false;
         this.esAtacado=false;
-        this.mana = manaMaximo; // Comienza con maná lleno
+        this.vida=1000;
+        this.mana = 100; // Comienza con maná lleno
 
         if (tipo.equalsIgnoreCase("enki")) {
         	
@@ -69,36 +64,35 @@ public class Personaje {
     public int getVida() {
         return vida;
     }
-
-    public int getVidaMaxima() {
-        return vidaMaxima;
+    public int setVida() {
+    	
+        return vida+20;
     }
 
-   
 
-    public boolean gastarMana(int cantidad) {
-    	if (this.mana >= cantidad) {
-    	this.mana -= cantidad;
+    public boolean gastarMana() {
+    	if (this.mana >= 20) {
+    	this.mana -= 20;
     	return true;
     	}
     	return false;
     	}
-    public void recuperarMana(int cantidad) {
-    	this.mana += cantidad;
-    	if (this.mana > manaMaximo) {
-    	this.mana = manaMaximo;
+    public void recuperarMana() {
+    	this.mana += 20;
+    	if (this.mana > 100) {
+    	this.mana = 100;
+    		}
     	}
-    	}
-    public boolean tieneManaSuficiente(int cantidad) {
-        return mana >= cantidad;
-    }
-    
-    public void recibirDanio(int cantidad) {
-        this.vida -= cantidad;
+
+    public void recibirDanio() {
+        this.vida -= 1;
         if (this.vida < 0) {
             this.vida = 0;
         }
     }
+    public void recuperarVida() {
+    	this.vida +=20;
+}
     public boolean colisionaCon(Murcielago m) {
         double dx = this.x - m.getX();
         double dy = this.y - m.getY();
@@ -256,10 +250,7 @@ public class Personaje {
 		return mana;
 	}
 
-	public int getManaMaximo() {
-		// TODO Auto-generated method stub
-		return manaMaximo;
-	}
+
 
 }
 

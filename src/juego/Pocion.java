@@ -1,7 +1,7 @@
 package juego;
 
 import entorno.Entorno;
-import java.awt.Color;
+
 import java.awt.Image;
 
 public class Pocion {
@@ -19,8 +19,7 @@ public class Pocion {
 
     public void dibujar(Entorno entorno) {
         if (activa) {
-            //entorno.dibujarCirculo(x, y, radio, Color.GREEN);
-            //entorno.dibujarCirculo(x, y, radio-5, new Color(0, 200, 0, 150));
+
         	entorno.dibujarImagen(potion, x, y, 0); 
         }
     }

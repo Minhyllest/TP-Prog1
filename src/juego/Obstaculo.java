@@ -3,7 +3,7 @@ package juego;
 import entorno.Entorno;
 import entorno.Herramientas;
 
-import java.awt.Color;
+
 import java.awt.Image;
 
 public class Obstaculo {
@@ -26,8 +26,8 @@ public class Obstaculo {
     }
 
     public boolean colisionaCon(Personaje personaje) {
-        return Math.abs(this.x - personaje.getX()) < (this.ancho / 2 + personaje.getAncho() / 2) &&
-               Math.abs(this.y - personaje.getY()) < (this.alto / 2 + personaje.getAlto() / 2);
+        return Math.abs(this.x - personaje.getX()) < (this.ancho / 4 + personaje.getAncho() / 4+10) &&
+               Math.abs(this.y - personaje.getY()) < (this.alto / 4 + personaje.getAlto() / 4+10);
     }
 
     public void dibujarDebug(Entorno entorno) {
