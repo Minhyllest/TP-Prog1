@@ -217,16 +217,16 @@ public class Juego extends InterfaceJuego {
                 } else {
                     personaje.quedarseQuieto();
                 }
-//                if(personaje.getVida()==0) {
-//                	estado = EstadoJuego.FIN;
-//                }
-// 
-//                	if(contadorMurci == murci.length) {
-//                		estado = EstadoJuego.GANASTE;
-//                	}
-//                	System.out.println(contadorMurci);
-//                
-//                
+               if(personaje.getVida()==0) {
+               	estado = EstadoJuego.FIN;
+               }
+
+               	if(contadorMurci == murci.length) {
+               		estado = EstadoJuego.GANASTE;
+               	}
+               	System.out.println(contadorMurci);
+               
+               
                 break;
             
             case FIN:
